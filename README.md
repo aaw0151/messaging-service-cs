@@ -4,5 +4,5 @@ This program is run using client-server architecture. The server can host multip
 Type "make" into terminal to create executables: server and client.
 Type "make clean" to remove .o and executable files.
 
-Type ./server port_number to run the server.
-Type ./client hostname port_number to run the client.
+Type "./server port_number" to run the server.
+Type "./client hostname port_number" to run the client.
