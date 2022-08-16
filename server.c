@@ -76,23 +76,23 @@ int main(int argc, char* argv[])
 {
 	fd_set master; //set of master file descs
 	fd_set read_fds; //set of readable file descs
-	int fdmax, i, j, k, m, n, on = 1, portno, newsockfd; //int for max file desc, loop vars (i, j, k), for reuse addr, port number, and incoming socket file desc
+	int fdmax, i = -1, j = -1, k = -1, m = -1, n = -1, on = 1, portno = -1, newsockfd = -1; //int for max file desc, loop vars (i, j, k), for reuse addr, port number, and incoming socket file desc
 	int sockfd= 0; //initial socket file desc
 	struct sockaddr_in my_addr, client_addr; //server address and client address
 	socklen_t addrlen; //length of address
-	int  nread; //int for byte read amount
+	int  nread = -1; //int for byte read amount
 	char buffer[BUFFER_SIZE + 1]; //char array for input buffer from clients
 	char chatlog[CHATLOG_SIZE][USERNAME_SIZE + BUFFER_SIZE + 2]; //char 2d array to save chat log of clients
 	int  chatlogcount = 0; //int for counter for chat log
 	int  ischatsaved = -1; //boolean for saving chat log
 	char usernames[USERS][USERNAME_SIZE]; //char 2d array for usernames of clients
 	char temp[USERNAME_SIZE + BUFFER_SIZE + 2]; //char array for output for clients (for formatting)
-	char* chrptr; //char pointer used for word blacklist
+	char* chrptr = NULL; //char pointer used for word blacklist
 	int  filedescs[USERS]; //int array for current file descriptors alive
 	char** wordblacklist = malloc(2 * sizeof(char*)); //double pointer to list of blacklisted words
-	int wordblacklistcount; //counter for the list of blacklisted words
-	int wordblacklistcap; //capacity for the list of blacklisted words
-	FILE* fp; //file pointer for blockable words and chatlog
+	int wordblacklistcount = -1; //counter for the list of blacklisted words
+	int wordblacklistcap = -1; //capacity for the list of blacklisted words
+	FILE* fp = NULL; //file pointer for blockable words and chatlog
 
 
 	for(i = 0; i < USERS; i++) //intializing file descriptor array
@@ -271,7 +271,7 @@ int main(int argc, char* argv[])
 							fdmax = newsockfd;
 						}
 						printf("Client connected, %s:%d", inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port)); //outputting client information to server
-						if(!(nread = recv(newsockfd, buffer, BUFFER_SIZE, 0)) <= 0) //if the current message can be read (username mesage) (initial)
+						if(!((nread = recv(newsockfd, buffer, BUFFER_SIZE, 0)) <= 0)) //if the current message can be read (username mesage) (initial)
 						{
 							buffer[nread] = '\0';
 							for(j = 0; j < USERS; j++)

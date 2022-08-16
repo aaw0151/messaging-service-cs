@@ -1,17 +1,22 @@
+CC = gcc
+CFLAGS = -Wall -g
+LIBS =
+
+
 all : server client
 
 server : server.o
-	gcc server.o -o server
+	${CC} ${CFLAGS} server.o -o server ${LIBS}
 
 client : client.o
-	gcc client.o -o client
+	${CC} ${CFLAGS} client.o -o client ${LIBS}
 
 server.o : server.c
-	gcc server.c -c
+	${CC} ${CFLAGS} server.c -c ${LIBS}
 
 client.o : client.c
-	gcc client.c -c
+	${CC} ${CFLAGS} client.c -c ${LIBS}
 
 
 clean :
-	rm *.o server client
+	rm server.o client.o server client
