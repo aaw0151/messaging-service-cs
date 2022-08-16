@@ -205,7 +205,7 @@ int main(int argc, char* argv[])
 							}
 							if(i == USERS - 1) //user never found
 							{
-								printf("User \"%.*s\" is not online.\n" , strlen(buffer) - 7, &buffer[6]);
+								printf("User \"%.*s\" is not online.\n" , (int)(strlen(buffer) - 7), &buffer[6]);
 								fflush(stdout);
 								break;
 							}

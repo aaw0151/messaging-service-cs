@@ -1,0 +1,7 @@
+CHANGE LOG
+=======================================
+15/08/2022:01
+----------
+- Updated server.c to remove warning when casting <unsigned long int> to <int>
+----------
+
