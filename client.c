@@ -80,9 +80,10 @@ int main(int argc, char* argv[])
 					fgets(send_buffer, BUFFER_SIZE, stdin);
 					if (strcmp(send_buffer , "quit\n") == 0) {
 						exit(0);
-					}else
+					} else {
 						send(sockfd, send_buffer, strlen(send_buffer), 0);
-				}else {
+					}
+				} else {
 					nread = recv(sockfd, recv_buffer, BUFFER_SIZE, 0);
 					recv_buffer[nread] = '\0';
 					printf("%s" , recv_buffer);

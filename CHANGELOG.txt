@@ -4,4 +4,9 @@ CHANGE LOG
 ----------
 - Updated server.c to remove warning when casting <unsigned long int> to <int>
 ----------
-
+=======================================
+01/10/2022:01
+----------
+- Updated server.c for security fixes, mainly changing string functions to safer buffered functions
+- Updated client.c for whitespace refactoring
+----------

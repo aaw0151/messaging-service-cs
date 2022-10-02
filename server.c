@@ -14,6 +14,18 @@
 #define USERS 5
 #define USERNAME_SIZE 17
 
+int clearChatBuffer(char* buffer)
+{
+	int* ret = (int*) memset(buffer, '\0', BUFFER_SIZE);
+	if(ret == NULL) 
+	{
+		perror("clearChatBuffer memset");
+		return 1;
+	}
+	return 0;
+
+}
+
 char** ReadWordBlacklist(FILE* fp, char** arr, int* count, int* cap)
 {
 	char buffer[BUFFER_SIZE + 1];
@@ -167,7 +179,7 @@ int main(int argc, char* argv[])
 
 		if(FD_ISSET(0, &read_fds)) //reading stdin
 		{
-			memset(buffer, '\0', BUFFER_SIZE);
+			clearChatBuffer(buffer);
 			if((nread = read(0, buffer, BUFFER_SIZE)) > 0)
 			{
 				/*
@@ -181,17 +193,17 @@ int main(int argc, char* argv[])
 						for(i = 0; i < USERS; i++)
 						{
 							//printf("test=%.*s\n", strlen(usernames[i]), &buffer[6]);
-							if((strcmp(usernames[i], "\0") != 0) && (strncmp(usernames[i], &buffer[6], strlen(usernames[i])) == 0) && (strlen(&buffer[6]) - 1 == strlen(usernames[i]))) //found user
+							if((strncmp(usernames[i], "\0", BUFFER_SIZE) != 0) && (strncmp(usernames[i], &buffer[6], strlen(usernames[i])) == 0) && (strlen(&buffer[6]) - 1 == strlen(usernames[i]))) //found user
 							{
 								printf("Kicking user \"%s\".\n", usernames[i]);
 								fflush(stdout);
 								getpeername(filedescs[i], (struct sockaddr*) &client_addr, (socklen_t*) &addrlen);
-								printf("Client disconnected, %s:%d, (kicked)\n", inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port));
+								printf("Client, %s, disconnected, %s:%d, (kicked)\n", usernames[i], inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port));
 								fflush(stdout);
 								close(filedescs[i]);
 								FD_CLR(filedescs[i], &master);
 								memset(temp, '\0', USERNAME_SIZE + BUFFER_SIZE + 2);
-								sprintf(temp, "%s has connected.\n", usernames[i]);
+								snprintf(temp, BUFFER_SIZE, "%s has connected.\n", usernames[i]);
 								filedescs[i] = -1;
 								for(k = 0; k < USERS; k++) //looping through all possible connections
 								{
@@ -245,7 +257,7 @@ int main(int argc, char* argv[])
 						printf("\tusage: /wordblacklist <flag>\n\t       -r Reload blacklist\n\t       -p Print blacklist\n");
 					}
 				}
-				memset(buffer, '\0', BUFFER_SIZE);
+				clearChatBuffer(buffer);
 			}
 			else
 			{
@@ -282,13 +294,13 @@ int main(int argc, char* argv[])
 
 								if(filedescs[j] == -1) //assigning new username and file descriptior
 								{
-									strcpy(usernames[j], buffer);
+									strncpy(usernames[j], buffer, BUFFER_SIZE);
 									filedescs[j] = newsockfd;
 									printf(", named \"%s\"\n", usernames[j]);
 									fflush(stdout);
 									break;
 								}
-								else if(strcmp(usernames[j], buffer) == 0) //check if the username is taken
+								else if(strncmp(usernames[j], buffer, BUFFER_SIZE) == 0) //check if the username is taken
 								{
 									printf("\n");
 									if(send(newsockfd, "Sorry, that username is taken. Try again later...\n", 51, 0) == -1) //sending disconnect message
@@ -320,7 +332,7 @@ int main(int argc, char* argv[])
 				}
 				else
 				{
-					memset(buffer, '\0', BUFFER_SIZE); //clearing buffer
+					clearChatBuffer(buffer);
 					if ((nread = recv(i, buffer, BUFFER_SIZE, 0)) <= 0) //checking if client disconneted
 					{
 						/*
@@ -330,7 +342,6 @@ int main(int argc, char* argv[])
 						if(nread == 0) 
 						{
 							getpeername(i, (struct sockaddr*) &client_addr, (socklen_t*) &addrlen);
-							printf("Client disconnected, %s:%d\n", inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port));
 							fflush(stdout);
 							for(j = 0; j < USERS; j++) //removing client from usernames and filedescs, notifying other clients of the disconnection
 							{
@@ -338,7 +349,8 @@ int main(int argc, char* argv[])
 								{
 									filedescs[j] = -1; //resetting file descriptor in array
 									memset(temp, '\0', USERNAME_SIZE + BUFFER_SIZE + 2); //clearing buffer
-									sprintf(temp, "%s has disconnected.\n", usernames[j]); //formating disconnect message to temp
+								        printf("Client, %s, disconnected, %s:%d\n", usernames[j], inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port));
+									snprintf(temp, BUFFER_SIZE, "%s has disconnected.\n", usernames[j]); //formating disconnect message to temp
 									for(k = 0; k < USERS; k++) //looping through all possible connections
 									{
 										if(filedescs[k] != -1) //sending to alive connections
@@ -368,7 +380,7 @@ int main(int argc, char* argv[])
 							if(filedescs[k] == i)
 							{
 								memset(temp, '\0', USERNAME_SIZE + BUFFER_SIZE + 2); //clearing buffer
-								sprintf(temp, "%s> %s", usernames[k], buffer);
+								snprintf(temp, USERNAME_SIZE + BUFFER_SIZE + 2, "%s> %s", usernames[k], buffer);
 								break;
 							}
 						}
